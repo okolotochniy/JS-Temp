@@ -1,12 +1,22 @@
-const timer = document.querySelector('#counter');
+const counterElement = document.querySelector('#counter');
 const buttonStart = document.querySelector('#start');
 const buttonPause = document.querySelector('#pause');
 const buttonReset = document.querySelector('#reset');
 
-buttonStart.addEventListener('click', startCount());
+let counter = 0;
+let timerId;
 
+buttonStart.onclick = function () {
+   timerId = setInterval(function () {
+        counter++;
+        counterElement.innerText = counter;
+    }, 1000)
+}
+buttonPause.onclick = function () {
+    clearInterval(timerId)
+}
 
-
-function startCount() {
-    setInterval(1000, )
+buttonReset.onclick = function () {
+    counter = 0;
+    counterElement.innerText = counter;
 }
