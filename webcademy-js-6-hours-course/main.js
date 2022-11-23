@@ -1,22 +1,25 @@
-const counterElement = document.querySelector('#counter');
-const buttonStart = document.querySelector('#start');
-const buttonPause = document.querySelector('#pause');
-const buttonReset = document.querySelector('#reset');
+const valueDollar = document.querySelector('#usd');
+const valueEuro = document.querySelector('#eur');
+const url = 'https://www.cbr-xml-daily.ru/daily_json.js';
 
-let counter = 0;
-let timerId;
+console.log(valueDollar);
+console.log(valueEuro);
 
-buttonStart.onclick = function () {
-   timerId = setInterval(function () {
-        counter++;
-        counterElement.innerText = counter;
-    }, 1000)
-}
-buttonPause.onclick = function () {
-    clearInterval(timerId)
+getValueMoney();
+
+async function getValueMoney() {
+    try {
+        const response = await fetch(url);
+        const responseData = await response.json();
+        renderValueMoney(responseData);
+    } catch (err){
+        alert("Ошибка HTTP: " + err);
+    }
+
+} 
+
+function renderValueMoney(responseData) {
+    valueDollar.innerText = responseData.Valute.USD.Value.toFixed(2);
+    valueEuro.innerText = responseData.Valute.EUR.Value.toFixed(2);
 }
 
-buttonReset.onclick = function () {
-    counter = 0;
-    counterElement.innerText = counter;
-}
