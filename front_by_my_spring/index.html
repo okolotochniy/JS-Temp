@@ -1,39 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="#">
     <title>Foront by my spring</title>
 </head>
     <body>
     <header>
-        <h1>Employees table</h1>
+        <h1>Работники</h1>
     </header>
-    <table>
-        <thead>
-        <tr>
-            <td>id</td>
-            <td>name</td>
-            <td>surname</td>
-            <td>department</td>
-            <td>salary</td>
-        </tr>
-        </thead>
-        <tr>
-            <td>1</td>
-            <td>Ivan</td>
-            <td>Ivanov</td>
-            <td>IT</td>
-            <td>1200</td>
-        </tr>
-        <tr>
-            <td></td>
-        </tr>
-    </table>
-
-
-
-
-
+    <div class="content">
+        <table class="employees">
+            <thead>
+            <tr>
+                <td>№ п/п</td>
+                <td>id</td>
+                <td>Имя</td>
+                <td>Фамилия</td>
+                <td>Отдел</td>
+                <td>Зарплата</td>
+                <td>Действие</td>
+            </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="addEmployee">
+        <h2>Добавить работника</h2>
+            <form action="" method="post" enctype="application/json">
+                Имя:<br>
+                <input type="text" name="name" placeholder="Mickey">
+                <br>
+                Фамилия:<br>
+                <input type="text" name="surname" placeholder="Mouse">
+                <br>
+                Отдел:<br>
+                <input type="text" name="department" placeholder="IT">
+                <br>
+                Зарплата:<br>
+                <input type="number" name="salary" placeholder="1500">
+                <br><br>
+                <input type="submit" value="Отправить">
+            </form>
+    </div>
         <script src="./main.js"></script>
     </body>
 </html>
