@@ -21,6 +21,11 @@ function getAllEmployees() {
         })
         .then(json => selectionResponseProcessingFunction(json))
         .catch(error => {
+            const message = document.createElement('p')
+            message.innerText = 'Нет связи с сервером!'
+            document.querySelector('.employees').remove();
+            document.querySelector('.content').appendChild(message);
+
             console.log(error)
         });
 }
@@ -44,34 +49,37 @@ function parseAnswer (arrayData) {
 let listNumber = 1;
 function writeInTable (oneObjData) {
     const row = document.createElement('tr');
+    row.id = 'row' + oneObjData.id;
     document.querySelector('.employees').appendChild(row);
 
-    let idEmployee;
+    
 
     const listNumberTd = document.createElement('td')
     listNumberTd.innerHTML = listNumber ++;
-    document.querySelector('.employees').appendChild(listNumberTd);
+    row.appendChild(listNumberTd);
+
 
     
     for (let key in oneObjData) {
         const tableDt = document.createElement('td');
         tableDt.innerHTML = `${oneObjData[key]}`
-        document.querySelector('.employees').appendChild(tableDt);
-
-        idEmployee = oneObjData.id;
-        
+        if (oneObjData[key] === oneObjData.id){tableDt.hidden = true}
+        row.appendChild(tableDt);
     }
 
 
+    
     const tdButton = document.createElement('td');
-    document.querySelector('.employees').appendChild(tdButton);
+    row.appendChild(tdButton);
     
     const buttonUpdate = document.createElement('button');
+    buttonUpdate.id = oneObjData.id;
     buttonUpdate.innerText = 'Изменить';
+    buttonUpdate.onclick = function (){changeRecord(row.id, buttonUpdate)}
     tdButton.appendChild(buttonUpdate);
 
     const buttonDelete = document.createElement('button');
-    buttonDelete.id = idEmployee;
+    buttonDelete.id = oneObjData.id;
     buttonDelete.innerText = 'Удалить';
     buttonDelete.onclick = function (){deleteEmployee(buttonDelete.id)};
     tdButton.appendChild(buttonDelete);
@@ -121,4 +129,50 @@ function deleteEmployee(id) {
         })
         .then(serverResp => alert(serverResp))
         .then(() => location.reload())
+}
+
+function changeRecord(idRow, buttonUpdate) {
+    const changeableRow = document.getElementById(idRow);
+    const tdChangeableRow = changeableRow.querySelectorAll('td');
+    for (let i = 1; i <tdChangeableRow.length - 1; i++) {
+        const changeInput = document.createElement('input');
+        changeInput.value = tdChangeableRow[i].innerHTML;
+        tdChangeableRow[i].innerHTML = '';
+        tdChangeableRow[i].append(changeInput);
+    }
+    buttonUpdate.innerText = 'Сохранить';
+    buttonUpdate.onclick = function () {
+        createChangeEmployeeJson(idRow)
+        
+        
+    }
+    
+}
+
+function createChangeEmployeeJson(idRow) {
+    const modifiedRow = document.getElementById(idRow);
+    const inputModifiedRow = modifiedRow.querySelectorAll('input');
+    const modifiedEmployee = {
+        'id': inputModifiedRow[0].value,
+        'name': inputModifiedRow[1].value,
+        'surname': inputModifiedRow[2].value,
+        'department': inputModifiedRow[3].value,
+        'salary': inputModifiedRow[4].value
+    }
+    putEmployee(modifiedEmployee);
+}
+
+function putEmployee(modifiedEmployee) {
+
+    fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(modifiedEmployee),
+    })
+        .then(response => response.json())
+        .then(json => alert('Работник изменен: ' + JSON.stringify(json)))
+        .then(() => location.reload())
+        .catch(error => console.log(error))
 }
