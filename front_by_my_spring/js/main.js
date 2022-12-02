@@ -47,18 +47,17 @@ function parseAnswer (arrayData) {
 }
 
 let listNumber = 1;
+const tbody = document.createElement('tbody');
+document.querySelector('.employees').appendChild(tbody);
+
 function writeInTable (oneObjData) {
     const row = document.createElement('tr');
     row.id = 'row' + oneObjData.id;
-    document.querySelector('.employees').appendChild(row);
-
-    
+    document.querySelector('tbody').appendChild(row);
 
     const listNumberTd = document.createElement('td')
     listNumberTd.innerHTML = listNumber ++;
     row.appendChild(listNumberTd);
-
-
     
     for (let key in oneObjData) {
         const tableDt = document.createElement('td');
@@ -66,8 +65,6 @@ function writeInTable (oneObjData) {
         if (oneObjData[key] === oneObjData.id){tableDt.hidden = true}
         row.appendChild(tableDt);
     }
-
-
     
     const tdButton = document.createElement('td');
     row.appendChild(tdButton);
