@@ -1,5 +1,6 @@
 <template>
     <TitleDone></TitleDone>
+
 </template>
 
 <script>
@@ -8,8 +9,16 @@ import TitleDone from "@/components/TitleDone";
 export default {
   name: 'App',
   components: {
-    TitleDone
+    TitleDone,
+
+  },
+
+  mounted() {
+
+
   }
+
+
 }
 </script>
 

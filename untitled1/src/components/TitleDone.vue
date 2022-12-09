@@ -3,8 +3,8 @@
   <img alt="logo" class="logoDone" src="../assets/pngegg.png">
   <h1>Done JI EST: {{counter}}
     <span>
-    <button class="start-count" @click = "donCountRun">Старт Жи есть!</button>
-    <button class="stop-count" @click = "donCountStop">Стоп Жи есть!</button>
+    <button class="start-count" @click = "donCountRun(); salamSound()">Старт Жи есть!</button>
+    <button class="stop-count" @click = "donCountStop(); stopSound()">Стоп Жи есть!</button>
     </span>
     <span class="donDon" v-bind:style="doneColor">
       {{ doneDisplay }}
@@ -19,7 +19,10 @@
 </template>
 
 <script>
-const {Howl, Howler} = require('howler');
+
+
+import {Howl} from "howler";
+
 export default {
   name: "TitleDone",
 
@@ -34,43 +37,55 @@ export default {
 
       }
     },
+
     methods: {
       donCountRun() {
-        if (this.doneRun) {
-          const sound = new Howl({
-            src: ['sound.mp3']
-          });
 
-          sound.play();
+        if (this.doneRun) {
 
 
           setTimeout(() => {
                 this.counter++;
                 this.doneColor.color = 'red'
                 this.donCountRun()
+                this.doneSound()
               },
               2000);
           setTimeout(() => {
                 this.doneColor.color = 'white'
+
               },
               1000)
         }else {
           this.counter = 0
           this.doneColor.color = 'white'
+          this.doneRun = true;
         }
       },
 
       donCountStop() {
         this.doneRun = false
+
+      },
+
+      salamSound() {
+        let sound = new Howl({src: ['/cfkfv.mp3']});
+        sound.play();
+      },
+
+      stopSound() {
+        let sound = new Howl({src: ['/stop.mp3']});
+        sound.play();
+      },
+
+      doneSound() {
+        let sound = new Howl({src: ['/done1.mp3']});
+        sound.play();
       }
 
-    },
-
-    mounted() {
-
-
-
     }
+
+
 
 
 }

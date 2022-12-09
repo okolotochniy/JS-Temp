@@ -1,3 +1,12 @@
+import {Howl} from "/node_modules/howler/dist/howler.js"
+const buttonPlay = document.getElementById('play')
+buttonPlay.addEventListener('click', playSound)
+
+function playSound() {
+    const sound = new Howl({src: ['front_by_my_spring/sound/ramzan.mp3']});
+    sound.play();
+}
+
 const url = 'http://localhost:8081/api/employees';
 
 getAllEmployees();
