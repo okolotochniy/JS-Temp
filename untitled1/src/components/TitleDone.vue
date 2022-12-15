@@ -3,8 +3,8 @@
   <img alt="logo" class="logoDone" src="../assets/pngegg.png">
   <h1>Done JI EST: {{counter}}
     <span>
-    <button class="start-count" @click = "donCountRun(); salamSound()">Старт Жи есть!</button>
-    <button class="stop-count" @click = "donCountStop(); stopSound()">Стоп Жи есть!</button>
+    <button class="start-count" @click.once = "donCountRun(); salamSound()">Старт Жи есть!</button>
+    <button class="stop-count" @click.once = "donCountStop(); stopSound()">Стоп Жи есть!</button>
     </span>
     <span class="donDon" v-bind:style="doneColor">
       {{ doneDisplay }}
@@ -82,6 +82,11 @@ export default {
         let sound = new Howl({src: ['/done1.mp3']});
         sound.play();
       }
+
+    },
+    computed: {
+
+
 
     }
 
