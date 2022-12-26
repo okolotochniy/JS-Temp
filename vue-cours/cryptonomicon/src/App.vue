@@ -19,6 +19,31 @@
                 placeholder="Например DOGE"
               />
             </div>
+            <div
+              class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap"
+            >
+              <span
+                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+              >
+                BTC
+              </span>
+              <span
+                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+              >
+                DOGE
+              </span>
+              <span
+                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+              >
+                BCH
+              </span>
+              <span
+                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+              >
+                CHD
+              </span>
+            </div>
+            <div class="text-sm text-red-600">Такой тикер уже добавлен</div>
           </div>
         </div>
         <button
@@ -42,7 +67,6 @@
           Добавить
         </button>
       </section>
-
       <template v-if="tickers.length">
         <hr class="w-full border-t border-gray-600 my-4" />
         <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
@@ -143,10 +167,24 @@ export default {
       tickers: [],
       sel: null,
       graph: [],
+      allTickers: [],
     };
   },
-
+  created() {
+    this.getAllTickers();
+  },
   methods: {
+    async getAllTickers() {
+      await fetch(
+        "https://min-api.cryptocompare.com/data/all/coinlist?summary=true"
+      )
+        .then((resp) => resp.json())
+        .then((data) => {
+          const rez = Object.keys(data.Data);
+          console.log(rez);
+        });
+    },
+
     add() {
       const currentTicker = {
         name: this.ticker,
@@ -188,5 +226,3 @@ export default {
   },
 };
 </script>
-
-<style></style>
