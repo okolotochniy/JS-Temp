@@ -23,24 +23,12 @@
               class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap"
             >
               <span
+                v-for="(item, index) in filteredTickers"
+                :key="index"
                 class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+                @click="ticker = item"
               >
-                BTC
-              </span>
-              <span
-                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-              >
-                DOGE
-              </span>
-              <span
-                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-              >
-                BCH
-              </span>
-              <span
-                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-              >
-                CHD
+                {{ item }}
               </span>
             </div>
             <div class="text-sm text-red-600">Такой тикер уже добавлен</div>
@@ -168,6 +156,7 @@ export default {
       sel: null,
       graph: [],
       allTickers: [],
+      searchTicker: [],
     };
   },
   created() {
@@ -180,14 +169,13 @@ export default {
       )
         .then((resp) => resp.json())
         .then((data) => {
-          const rez = Object.keys(data.Data);
-          console.log(rez);
+          this.allTickers = Object.keys(data.Data);
         });
     },
 
     add() {
       const currentTicker = {
-        name: this.ticker,
+        name: this.ticker.toUpperCase(),
         price: "-",
       };
 
@@ -222,6 +210,19 @@ export default {
     select(ticker) {
       this.sel = ticker;
       this.graph = [];
+    },
+  },
+  computed: {
+    filteredTickers() {
+      if (this.ticker) {
+        return this.allTickers
+          .filter((item) => {
+            return item.includes(this.ticker.toUpperCase());
+          })
+          .sort()
+          .splice(0, 4);
+      }
+      return null;
     },
   },
 };
