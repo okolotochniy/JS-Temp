@@ -11,6 +11,7 @@
             <div class="mt-1 relative rounded-md shadow-md">
               <input
                 v-model="ticker"
+                @input="messageValidTicker = ''"
                 @keydown.enter="add"
                 type="text"
                 name="wallet"
@@ -20,18 +21,23 @@
               />
             </div>
             <div
-              class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap"
+              class="flex bg-white shadow-md p-0 rounded-md shadow-md flex-wrap"
             >
               <span
                 v-for="(item, index) in filteredTickers"
                 :key="index"
-                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-                @click="ticker = item"
+                class="p-1 inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+                @click="
+                  ticker = item;
+                  add(ticker);
+                "
               >
                 {{ item }}
               </span>
             </div>
-            <div class="text-sm text-red-600">Такой тикер уже добавлен</div>
+            <div class="text-sm text-red-600">
+              {{ messageValidTicker }}
+            </div>
           </div>
         </div>
         <button
@@ -157,6 +163,7 @@ export default {
       graph: [],
       allTickers: [],
       searchTicker: [],
+      messageValidTicker: "",
     };
   },
   created() {
@@ -178,21 +185,29 @@ export default {
         name: this.ticker.toUpperCase(),
         price: "-",
       };
+      if (
+        this.tickers.find((t) => {
+          return t.name === currentTicker.name;
+        })
+      ) {
+        this.messageValidTicker = "Такой тикер уже добавлен";
+      } else {
+        this.tickers.push(currentTicker);
 
-      this.tickers.push(currentTicker);
-      setInterval(async () => {
-        const getPriceCrypto = await fetch(
-          `https://min-api.cryptocompare.com/data/price?fsym=${currentTicker.name}&tsyms=USD&api_key=09db43ad45f9dc8fc4230a081eec9ed5e24398e2960c471d43f0f1cd2abccd97`
-        );
-        const data = await getPriceCrypto.json();
-        this.tickers.find((t) => t.name === currentTicker.name).price =
-          data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
+        setInterval(async () => {
+          const getPriceCrypto = await fetch(
+            `https://min-api.cryptocompare.com/data/price?fsym=${currentTicker.name}&tsyms=USD&api_key=09db43ad45f9dc8fc4230a081eec9ed5e24398e2960c471d43f0f1cd2abccd97`
+          );
+          const data = await getPriceCrypto.json();
+          this.tickers.find((t) => t.name === currentTicker.name).price =
+            data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
 
-        if (this.sel?.name === currentTicker.name) {
-          this.graph.push(data.USD);
-        }
-      }, 3000);
-      this.ticker = "";
+          if (this.sel?.name === currentTicker.name) {
+            this.graph.push(data.USD);
+          }
+        }, 3000);
+        this.ticker = "";
+      }
     },
 
     handleDelete(tickerToRemove) {
@@ -219,7 +234,6 @@ export default {
           .filter((item) => {
             return item.includes(this.ticker.toUpperCase());
           })
-          .sort()
           .splice(0, 4);
       }
       return null;
