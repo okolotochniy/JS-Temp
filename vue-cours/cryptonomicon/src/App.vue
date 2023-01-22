@@ -150,7 +150,8 @@
             viewBox="0 0 511.76 511.76"
             style="enable-background: new 0 0 512 512"
             xml:space="preserve"
-          >
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://svgjs.com/svgjs ">
             <g>
               <path
                 d="M436.896,74.869c-99.84-99.819-262.208-99.819-362.048,0c-99.797,99.819-99.797,262.229,0,362.048    c49.92,49.899,115.477,74.837,181.035,74.837s131.093-24.939,181.013-74.837C536.715,337.099,536.715,174.688,436.896,74.869z     M361.461,331.317c8.341,8.341,8.341,21.824,0,30.165c-4.16,4.16-9.621,6.251-15.083,6.251c-5.461,0-10.923-2.091-15.083-6.251    l-75.413-75.435l-75.392,75.413c-4.181,4.16-9.643,6.251-15.083,6.251c-5.461,0-10.923-2.091-15.083-6.251    c-8.341-8.341-8.341-21.845,0-30.165l75.392-75.413l-75.413-75.413c-8.341-8.341-8.341-21.845,0-30.165    c8.32-8.341,21.824-8.341,30.165,0l75.413,75.413l75.413-75.413c8.341-8.341,21.824-8.341,30.165,0    c8.341,8.32,8.341,21.824,0,30.165l-75.413,75.413L361.461,331.317z"
@@ -181,6 +182,8 @@
 // [x] График сломан если везде одинаковые значения
 // [x] При удалении тикера остается выбор
 
+import {loadTicker, getAllTickers} from "@/api";
+
 export default {
   name: "App",
 
@@ -198,7 +201,8 @@ export default {
     };
   },
   created() {
-    this.getAllTickers();
+
+    this.loadAllTickers();
 
     const windowData = Object.fromEntries(
       new URL(window.location).searchParams.entries()
@@ -220,27 +224,19 @@ export default {
     }
   },
   methods: {
-    async getAllTickers() {
-      await fetch(
-        "https://min-api.cryptocompare.com/data/all/coinlist?summary=true"
-      )
-        .then((resp) => resp.json())
-        .then((data) => {
-          this.allTickers = Object.keys(data.Data);
-        });
+
+    async loadAllTickers() {
+      this.allTickers = await getAllTickers();
     },
 
     subscribeToUpdates(tickerName) {
       setInterval(async () => {
-        const getPriceCrypto = await fetch(
-          `https://min-api.cryptocompare.com/data/price?fsym=${tickerName}&tsyms=USD&api_key=09db43ad45f9dc8fc4230a081eec9ed5e24398e2960c471d43f0f1cd2abccd97`
-        );
-        const data = await getPriceCrypto.json();
+        const exchangeData = await loadTicker(tickerName);
         this.tickers.find((t) => t.name === tickerName).price =
-          data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
+          exchangeData.USD > 1 ? exchangeData.USD.toFixed(2) : exchangeData.USD.toPrecision(2);
 
         if (this.selectedTicker?.name === tickerName) {
-          this.graph.push(data.USD);
+          this.graph.push(exchangeData.USD);
         }
       }, 3000);
       this.ticker = "";
@@ -257,9 +253,11 @@ export default {
         })
       ) {
         this.messageValidTicker = "Такой тикер уже добавлен";
+        return;
       }
       if (this.ticker === "") {
         this.messageValidTicker = "Поле не может быть пустым";
+        return;
       } else {
         this.tickers = [...this.tickers, currentTicker];
         this.subscribeToUpdates(currentTicker.name);
@@ -279,6 +277,7 @@ export default {
     },
   },
   computed: {
+
     filteredTickers() {
       if (this.ticker) {
         return this.allTickers
