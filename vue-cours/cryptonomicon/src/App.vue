@@ -95,7 +95,7 @@
                 {{ t.name }} - USD
               </dt>
               <dd class="mt-1 text-3xl font-semibold text-gray-900">
-                {{ t.price }}
+                {{ formatPrice(t.price) }}
               </dd>
             </div>
             <div class="w-full border-t border-gray-200"></div>
@@ -182,7 +182,7 @@
 // [x] График сломан если везде одинаковые значения
 // [x] При удалении тикера остается выбор
 
-import {loadTicker, getAllTickers} from "@/api";
+import { getAllTickers, subscribeToTicker, unsubscribeToTicker } from "@/api";
 
 export default {
   name: "App",
@@ -217,11 +217,14 @@ export default {
     const tickersData = localStorage.getItem("cryptonomicon-list");
     if (tickersData) {
       this.tickers = JSON.parse(tickersData);
-      this.tickers.forEach((ticker) => {
-        ticker.price = "-";
-        this.subscribeToUpdates(ticker.name);
+      this.tickers.forEach(ticker => {
+        subscribeToTicker(ticker.name, newPrice =>
+          this.updateTicker(ticker.name, newPrice)
+        );
       });
     }
+
+    setInterval(this.updateTikers, 5000);
   },
   methods: {
 
@@ -229,17 +232,23 @@ export default {
       this.allTickers = await getAllTickers();
     },
 
-    subscribeToUpdates(tickerName) {
-      setInterval(async () => {
-        const exchangeData = await loadTicker(tickerName);
-        this.tickers.find((t) => t.name === tickerName).price =
-          exchangeData.USD > 1 ? exchangeData.USD.toFixed(2) : exchangeData.USD.toPrecision(2);
+    updateTicker(tickerName, price) {
+      this.tickers
+        .filter(t => t.name === tickerName)
+        .forEach(t => {
+          if (t === this.selectedTicker) {
+            this.graph.push(price);
+          }
+          t.price = price;
+        });
+    },
 
-        if (this.selectedTicker?.name === tickerName) {
-          this.graph.push(exchangeData.USD);
-        }
-      }, 3000);
-      this.ticker = "";
+    formatPrice(price) {
+      if (price === "-") {
+        return price;
+      } else {
+        return price > 1 ? price.toFixed(2) : price.toPrecision(2);
+      }
     },
 
     add() {
@@ -260,9 +269,11 @@ export default {
         return;
       } else {
         this.tickers = [...this.tickers, currentTicker];
-        this.subscribeToUpdates(currentTicker.name);
+        subscribeToTicker(currentTicker.name, newPrice =>
+          this.updateTicker(currentTicker.name, newPrice));
+        this.filter = "";
+        this.ticker = "";
       }
-      this.filter = "";
     },
 
     handleDelete(tickerToRemove) {
@@ -270,6 +281,7 @@ export default {
       if (this.selectedTicker === tickerToRemove) {
         this.selectedTicker = null;
       }
+      unsubscribeToTicker(tickerToRemove.name)
     },
 
     select(ticker) {
